@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -23,6 +24,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
+  '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/shipping'
     | '/terms'
+    | '/wishlist'
     | '/category/$slug'
     | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/shipping'
     | '/terms'
+    | '/wishlist'
     | '/category/$slug'
     | '/product/$slug'
   id:
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/shipping'
     | '/terms'
+    | '/wishlist'
     | '/category/$slug'
     | '/product/$slug'
   fileRoutesById: FileRoutesById
@@ -195,12 +207,20 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
+  WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -307,6 +327,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
+  WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductSlugRoute: ProductSlugRoute,
 }
