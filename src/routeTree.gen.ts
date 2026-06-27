@@ -14,6 +14,7 @@ import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CartRouteImport } from './routes/cart'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -45,6 +46,11 @@ const FaqRoute = FaqRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BrandsRoute = BrandsRouteImport.update({
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/brands': typeof BrandsRoute
+  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/brands': typeof BrandsRoute
+  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/brands': typeof BrandsRoute
+  '/cart': typeof CartRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/brands'
+    | '/cart'
     | '/contact'
     | '/faq'
     | '/privacy'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/brands'
+    | '/cart'
     | '/contact'
     | '/faq'
     | '/privacy'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/blog'
     | '/brands'
+    | '/cart'
     | '/contact'
     | '/faq'
     | '/privacy'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRoute
   BrandsRoute: typeof BrandsRoute
+  CartRoute: typeof CartRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/brands': {
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BlogRoute: BlogRoute,
   BrandsRoute: BrandsRoute,
+  CartRoute: CartRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   PrivacyRoute: PrivacyRoute,
