@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/site/page-shell";
 
 export const Route = createFileRoute("/shipping")({
-  head: () => ({ meta: [{ title: "رویه ارسال | گل‌سا" }] }),
+  head: () => ({ meta: [{ title: "رویه ارسال | آشنا پرفیوم" }] }),
   component: () => (
     <PageShell title="رویه ارسال" subtitle="اطلاعات کامل درباره ارسال و تحویل سفارش‌ها.">
       <div className="mx-auto max-w-3xl space-y-3 text-sm leading-loose text-foreground/80">

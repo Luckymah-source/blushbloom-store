@@ -3,7 +3,7 @@ import { PageShell } from "@/components/site/page-shell";
 import { POSTS } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/blog")({
-  head: () => ({ meta: [{ title: "مجله زیبایی | گل‌سا" }, { name: "description", content: "مقالات آموزشی درباره مراقبت از پوست، آرایش و عطر." }] }),
+  head: () => ({ meta: [{ title: "مجله زیبایی | آشنا پرفیوم" }, { name: "description", content: "مقالات آموزشی درباره مراقبت از پوست، آرایش و عطر." }] }),
   component: () => (
     <PageShell title="مجله زیبایی" subtitle="مقالات و آموزش‌های زیبایی، مراقبت از پوست و آرایش.">
       <div className="grid gap-4 md:grid-cols-3">

@@ -77,10 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "گل‌سا | فروشگاه آرایشی و مراقبت از پوست" },
-      { name: "description", content: "فروشگاه آنلاین گل‌سا — محصولات اصل آرایشی، بهداشتی، مراقبت از پوست، عطر و اسپری از برندهای معتبر دنیا." },
+      { title: "آشنا پرفیوم | فروشگاه عطر، آرایشی و مراقبت از پوست" },
+      { name: "description", content: "فروشگاه آنلاین آشنا پرفیوم — محصولات اصل آرایشی، بهداشتی، مراقبت از پوست، عطر و اسپری از برندهای معتبر دنیا." },
       { name: "theme-color", content: "#f9c8d8" },
-      { property: "og:title", content: "گل‌سا | فروشگاه آرایشی و مراقبت از پوست" },
+      { property: "og:title", content: "آشنا پرفیوم | فروشگاه عطر، آرایشی و مراقبت از پوست" },
       { property: "og:description", content: "محصولات اصل آرایشی، بهداشتی، مراقبت از پوست، عطر و اسپری از برندهای معتبر دنیا." },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "fa_IR" },

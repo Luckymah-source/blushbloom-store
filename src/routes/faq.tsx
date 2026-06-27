@@ -3,7 +3,7 @@ import { PageShell } from "@/components/site/page-shell";
 import { FAQS } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/faq")({
-  head: () => ({ meta: [{ title: "سوالات متداول | گل‌سا" }, { name: "description", content: "پاسخ پرسش‌های رایج درباره خرید، ارسال و پرداخت." }] }),
+  head: () => ({ meta: [{ title: "سوالات متداول | آشنا پرفیوم" }, { name: "description", content: "پاسخ پرسش‌های رایج درباره خرید، ارسال و پرداخت." }] }),
   component: () => (
     <PageShell title="سوالات متداول" subtitle="پاسخ پرتکرارترین پرسش‌های شما.">
       <div className="mx-auto max-w-3xl space-y-3">
