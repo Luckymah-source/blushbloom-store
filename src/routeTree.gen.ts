@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/brands': typeof BrandsRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/brands': typeof BrandsRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/brands': typeof BrandsRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/brands'
     | '/contact'
+    | '/faq'
     | '/category/$slug'
     | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/brands'
     | '/contact'
+    | '/faq'
     | '/category/$slug'
     | '/product/$slug'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/brands'
     | '/contact'
+    | '/faq'
     | '/category/$slug'
     | '/product/$slug'
   fileRoutesById: FileRoutesById
@@ -117,12 +129,20 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   BrandsRoute: typeof BrandsRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   BrandsRoute: BrandsRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductSlugRoute: ProductSlugRoute,
 }
