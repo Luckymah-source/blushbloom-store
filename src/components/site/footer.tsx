@@ -8,8 +8,8 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="grid h-10 w-10 place-items-center rounded-full gradient-rose text-white font-bold shadow-soft">گ</div>
-              <span className="text-lg font-bold text-gradient-rose">گل‌سا</span>
+              <div className="grid h-10 w-10 place-items-center rounded-full gradient-rose text-white font-bold shadow-soft">آ</div>
+              <span className="text-lg font-bold text-gradient-rose">آشنا پرفیوم</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               فروشگاه آنلاین محصولات اصل آرایشی، بهداشتی و مراقبت از پوست با تضمین اصالت و ارسال به سراسر ایران.
@@ -41,7 +41,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />تهران، خیابان ولیعصر، پلاک ۱۲۳۴</li>
               <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0 text-primary" />۰۲۱-۱۲۳۴۵۶۷۸</li>
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" />support@golsa.shop</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0 text-primary" />support@ashnaperfume.shop</li>
             </ul>
           </div>
         </div>
@@ -49,7 +49,7 @@ export function Footer() {
 
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row">
-          <span>© ۱۴۰۴ گل‌سا. تمامی حقوق محفوظ است.</span>
+          <span>© ۱۴۰۴ آشنا پرفیوم. تمامی حقوق محفوظ است.</span>
           <span>طراحی و توسعه با ❤ در ایران</span>
         </div>
       </div>

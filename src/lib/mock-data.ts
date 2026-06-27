@@ -24,14 +24,14 @@ export const formatToman = (n: number) =>
   new Intl.NumberFormat("fa-IR").format(n) + " تومان";
 
 export const PRODUCTS: Product[] = [
-  { id: "1", slug: "pink-rose-cream", title: "کرم آبرسان رز صورتی", brand: "گل‌سا", category: "مراقبت از پوست", price: 580000, oldPrice: 720000, rating: 4.8, reviews: 124, sold: 980, image: product1, badge: "پرفروش" },
+  { id: "1", slug: "pink-rose-cream", title: "کرم آبرسان رز صورتی", brand: "آشنا پرفیوم", category: "مراقبت از پوست", price: 580000, oldPrice: 720000, rating: 4.8, reviews: 124, sold: 980, image: product1, badge: "پرفروش" },
   { id: "2", slug: "matte-lipstick-velvet", title: "رژ لب مات ولوت", brand: "لومیه", category: "آرایش لب", price: 320000, oldPrice: 390000, rating: 4.7, reviews: 89, sold: 1250, image: product2, badge: "تخفیف" },
   { id: "3", slug: "rose-perfume", title: "عطر زنانه رز فرنچ", brand: "پاریس بل", category: "عطر و ادکلن", price: 1450000, rating: 4.9, reviews: 56, sold: 420, image: product3, badge: "ویژه" },
   { id: "4", slug: "vitamin-c-serum", title: "سرم ویتامین C درخشان‌کننده", brand: "اسکین لب", category: "مراقبت از پوست", price: 690000, oldPrice: 850000, rating: 4.8, reviews: 210, sold: 1820, image: product4, badge: "جدید" },
   { id: "5", slug: "blush-palette", title: "پالت رژ گونه شش‌رنگ", brand: "لومیه", category: "آرایش صورت", price: 540000, rating: 4.6, reviews: 73, sold: 640, image: product5 },
-  { id: "6", slug: "body-mist-pink", title: "بادی اسپلش صورتی", brand: "گل‌سا", category: "عطر و ادکلن", price: 280000, oldPrice: 350000, rating: 4.5, reviews: 142, sold: 2100, image: product6, badge: "تخفیف" },
+  { id: "6", slug: "body-mist-pink", title: "بادی اسپلش صورتی", brand: "آشنا پرفیوم", category: "عطر و ادکلن", price: 280000, oldPrice: 350000, rating: 4.5, reviews: 142, sold: 2100, image: product6, badge: "تخفیف" },
   { id: "7", slug: "night-cream", title: "کرم شب ترمیم‌کننده", brand: "اسکین لب", category: "مراقبت از پوست", price: 820000, rating: 4.7, reviews: 64, sold: 510, image: product1 },
-  { id: "8", slug: "lip-tint", title: "تینت لب آبرسان", brand: "گل‌سا", category: "آرایش لب", price: 195000, oldPrice: 240000, rating: 4.4, reviews: 95, sold: 1430, image: product2, badge: "تخفیف" },
+  { id: "8", slug: "lip-tint", title: "تینت لب آبرسان", brand: "آشنا پرفیوم", category: "آرایش لب", price: 195000, oldPrice: 240000, rating: 4.4, reviews: 95, sold: 1430, image: product2, badge: "تخفیف" },
 ];
 
 export const CATEGORIES = [
@@ -43,7 +43,7 @@ export const CATEGORIES = [
   { slug: "body", title: "بدن و حمام", icon: "❁" },
 ];
 
-export const BRANDS = ["گل‌سا", "لومیه", "پاریس بل", "اسکین لب", "رزا", "نیووآ", "بل‌فام", "اوریفلیم"];
+export const BRANDS = ["آشنا پرفیوم", "لومیه", "پاریس بل", "اسکین لب", "رزا", "نیووآ", "بل‌فام", "اوریفلیم"];
 
 export const POSTS = [
   { slug: "skin-routine", title: "روتین کامل مراقبت از پوست در ۷ مرحله", excerpt: "از پاک‌کننده تا کرم ضدآفتاب؛ راهنمای جامع پوست درخشان.", readTime: "۸ دقیقه", date: "۲ خرداد ۱۴۰۴" },
@@ -58,11 +58,11 @@ export const TESTIMONIALS = [
 ];
 
 export const FAQS = [
-  { q: "آیا محصولات اصل هستند؟", a: "بله، تمامی محصولات گل‌سا با گارانتی اصالت و مستقیماً از نمایندگی‌های رسمی برندها تأمین می‌شوند." },
+  { q: "آیا محصولات اصل هستند؟", a: "بله، تمامی محصولات آشنا پرفیوم با گارانتی اصالت و مستقیماً از نمایندگی‌های رسمی برندها تأمین می‌شوند." },
   { q: "روش پرداخت چگونه است؟", a: "در حال حاضر پرداخت به‌صورت کارت‌به‌کارت انجام می‌شود. پس از ثبت سفارش، اطلاعات حساب نمایش داده می‌شود و شما رسید پرداخت را آپلود می‌کنید." },
   { q: "ارسال سفارش چند روز طول می‌کشد؟", a: "سفارش‌ها پس از تایید پرداخت، ظرف ۱ تا ۳ روز کاری ارسال می‌شوند. ارسال به سراسر ایران انجام می‌شود." },
   { q: "امکان مرجوع کردن کالا وجود دارد؟", a: "بله، تا ۷ روز پس از دریافت کالا در صورت سالم بودن بسته‌بندی و عدم استفاده، امکان مرجوعی وجود دارد." },
-  { q: "چگونه با پشتیبانی در تماس باشم؟", a: "از طریق صفحه تماس با ما، ایمیل support@golsa.shop یا شماره ۰۲۱-۱۲۳۴۵۶۷۸ در ساعات اداری در دسترس هستیم." },
+  { q: "چگونه با پشتیبانی در تماس باشم؟", a: "از طریق صفحه تماس با ما، ایمیل support@ashnaperfume.shop یا شماره ۰۲۱-۱۲۳۴۵۶۷۸ در ساعات اداری در دسترس هستیم." },
 ];
 
 export const SLIDES = [

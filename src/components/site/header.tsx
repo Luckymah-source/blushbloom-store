@@ -11,7 +11,7 @@ export function Header() {
       <div className="bg-primary/95 text-primary-foreground text-xs">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2">
           <span>ارسال رایگان برای سفارش‌های بالای ۹۹۰ هزار تومان</span>
-          <span className="hidden sm:inline">۰۲۱-۱۲۳۴۵۶۷۸ • support@golsa.shop</span>
+          <span className="hidden sm:inline">۰۲۱-۱۲۳۴۵۶۷۸ • support@ashnaperfume.shop</span>
         </div>
       </div>
 
@@ -27,11 +27,11 @@ export function Header() {
 
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <div className="grid h-10 w-10 place-items-center rounded-full gradient-rose text-white font-bold shadow-soft">
-              گ
+              آ
             </div>
             <div className="hidden sm:block">
-              <div className="text-lg font-bold leading-none text-gradient-rose">گل‌سا</div>
-              <div className="text-[10px] text-muted-foreground">فروشگاه آرایشی و مراقبت</div>
+              <div className="text-lg font-bold leading-none text-gradient-rose">آشنا پرفیوم</div>
+              <div className="text-[10px] text-muted-foreground">فروشگاه عطر، آرایشی و مراقبت</div>
             </div>
           </Link>
 
@@ -85,7 +85,7 @@ export function Header() {
           <div className="absolute inset-0 bg-foreground/30 backdrop-blur-sm" />
           <aside className="absolute inset-y-0 end-0 w-80 max-w-[85vw] bg-background p-6 shadow-glow" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <span className="text-lg font-bold text-gradient-rose">گل‌سا</span>
+              <span className="text-lg font-bold text-gradient-rose">آشنا پرفیوم</span>
               <button onClick={() => setOpen(false)} className="grid h-9 w-9 place-items-center rounded-full hover:bg-rose-soft">
                 <X className="h-5 w-5" />
               </button>

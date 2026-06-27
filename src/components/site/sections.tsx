@@ -57,7 +57,7 @@ export function DealsBanner() {
         <div className="relative max-w-md">
           <span className="inline-block rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-primary">تخفیف ویژه هفته</span>
           <h2 className="mt-4 text-2xl md:text-4xl font-black">تا ۵۰٪ تخفیف روی مراقبت از پوست</h2>
-          <p className="mt-3 text-sm md:text-base text-foreground/80">جشنواره بهاره گل‌سا برای زیبایی همیشگی شما — فقط تا پایان هفته.</p>
+          <p className="mt-3 text-sm md:text-base text-foreground/80">جشنواره بهاره آشنا پرفیوم برای زیبایی همیشگی شما — فقط تا پایان هفته.</p>
           <Link to="/category/$slug" params={{ slug: "skincare" }} className="mt-6 inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-bold hover:opacity-90 transition">
             مشاهده تخفیف‌ها <ChevronLeft className="h-4 w-4" />
           </Link>
@@ -157,7 +157,7 @@ export function NewsletterSection() {
         <div className="absolute -bottom-20 -start-20 h-72 w-72 rounded-full bg-primary/40 blur-3xl" />
         <div className="relative grid gap-6 md:grid-cols-2 md:items-center">
           <div>
-            <h2 className="text-2xl md:text-3xl font-black">عضو خبرنامه گل‌سا شوید</h2>
+            <h2 className="text-2xl md:text-3xl font-black">عضو خبرنامه آشنا پرفیوم شوید</h2>
             <p className="mt-2 text-sm text-background/80">از تخفیف‌ها، محصولات جدید و نکات زیبایی باخبر شوید.</p>
           </div>
           <form
@@ -183,7 +183,7 @@ export function NewsletterSection() {
 export function FeaturedProducts() {
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
-      <SectionHeader eyebrow="منتخب گل‌سا" title="محصولات ویژه" href="/category/skincare" />
+      <SectionHeader eyebrow="منتخب آشنا پرفیوم" title="محصولات ویژه" href="/category/skincare" />
       <ProductGrid items={PRODUCTS.slice(0, 4)} />
     </section>
   );

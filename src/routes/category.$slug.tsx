@@ -8,8 +8,8 @@ export const Route = createFileRoute("/category/$slug")({
     const name = c?.title ?? "دسته‌بندی";
     return {
       meta: [
-        { title: `${name} | گل‌سا` },
-        { name: "description", content: `خرید آنلاین محصولات ${name} از برندهای معتبر در فروشگاه گل‌سا.` },
+        { title: `${name} | آشنا پرفیوم` },
+        { name: "description", content: `خرید آنلاین محصولات ${name} از برندهای معتبر در فروشگاه آشنا پرفیوم.` },
       ],
     };
   },

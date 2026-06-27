@@ -18,10 +18,10 @@ export const Route = createFileRoute("/product/$slug")({
     return { product, detail: getProductDetail(product) };
   },
   head: ({ params, loaderData }) => {
-    const title = loaderData ? `${loaderData.product.title} | گل‌سا` : "جزئیات محصول | گل‌سا";
+    const title = loaderData ? `${loaderData.product.title} | آشنا پرفیوم` : "جزئیات محصول | آشنا پرفیوم";
     const desc = loaderData
       ? `خرید ${loaderData.product.title} از ${loaderData.product.brand} با ضمانت اصالت و ارسال سریع.`
-      : "جزئیات کامل محصول در فروشگاه گل‌سا.";
+      : "جزئیات کامل محصول در فروشگاه آشنا پرفیوم.";
     return {
       meta: [
         { title },

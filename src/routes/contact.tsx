@@ -3,13 +3,13 @@ import { PageShell } from "@/components/site/page-shell";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "تماس با ما | گل‌سا" }, { name: "description", content: "راه‌های ارتباط با پشتیبانی فروشگاه گل‌سا." }] }),
+  head: () => ({ meta: [{ title: "تماس با ما | آشنا پرفیوم" }, { name: "description", content: "راه‌های ارتباط با پشتیبانی فروشگاه آشنا پرفیوم." }] }),
   component: () => (
     <PageShell title="تماس با ما" subtitle="ما همیشه آماده پاسخگویی به شما هستیم.">
       <div className="grid gap-4 md:grid-cols-3">
         {[
           { i: <Phone className="h-5 w-5" />, t: "تلفن", d: "۰۲۱-۱۲۳۴۵۶۷۸" },
-          { i: <Mail className="h-5 w-5" />, t: "ایمیل", d: "support@golsa.shop" },
+          { i: <Mail className="h-5 w-5" />, t: "ایمیل", d: "support@ashnaperfume.shop" },
           { i: <MapPin className="h-5 w-5" />, t: "نشانی", d: "تهران، خیابان ولیعصر، پلاک ۱۲۳۴" },
         ].map((c) => (
           <div key={c.t} className="glass-pink rounded-3xl p-6 text-center">
