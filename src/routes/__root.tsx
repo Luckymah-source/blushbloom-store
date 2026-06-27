@@ -77,20 +77,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "گل‌سا | فروشگاه آرایشی و مراقبت از پوست" },
+      { name: "description", content: "فروشگاه آنلاین گل‌سا — محصولات اصل آرایشی، بهداشتی، مراقبت از پوست، عطر و اسپری از برندهای معتبر دنیا." },
+      { name: "theme-color", content: "#f9c8d8" },
+      { property: "og:title", content: "گل‌سا | فروشگاه آرایشی و مراقبت از پوست" },
+      { property: "og:description", content: "محصولات اصل آرایشی، بهداشتی، مراقبت از پوست، عطر و اسپری از برندهای معتبر دنیا." },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "fa_IR" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "canonical", href: "/" },
     ],
   }),
   shellComponent: RootShell,
@@ -101,11 +102,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="fa" dir="rtl">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="font-sans antialiased">
         {children}
         <Scripts />
       </body>
