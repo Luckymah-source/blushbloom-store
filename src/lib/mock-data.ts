@@ -70,3 +70,75 @@ export const SLIDES = [
   { title: "تا ۴۰٪ تخفیف ویژه عطرها", subtitle: "رایحه‌های ماندگار از برندهای جهانی", cta: "خرید عطر", href: "/category/perfume", tag: "تخفیف ویژه" },
   { title: "رنگ‌های جدید پاییزی", subtitle: "رژ لب ولوت در ۱۲ رنگ نو", cta: "ببینید", href: "/category/lips", tag: "کالکشن جدید" },
 ];
+
+export type ProductReview = {
+  name: string;
+  rating: number;
+  date: string;
+  title: string;
+  text: string;
+  verified?: boolean;
+};
+
+export type ProductDetail = {
+  description: string;
+  highlights: string[];
+  ingredients: string[];
+  usage: string[];
+  suitableFor: string[];
+  specs: { label: string; value: string }[];
+  variants?: { label: string; color: string }[];
+  gallery: string[];
+  reviews: ProductReview[];
+};
+
+const DEFAULT_REVIEWS: ProductReview[] = [
+  { name: "نگار حسینی", rating: 5, date: "۱۲ خرداد ۱۴۰۴", title: "فوق‌العاده‌ست", text: "بافتش سبکه و خیلی خوب جذب میشه. پوستم بعد از دو هفته شفاف‌تر شده.", verified: true },
+  { name: "آرزو محمدی", rating: 4, date: "۲ خرداد ۱۴۰۴", title: "راضی‌ام", text: "بسته‌بندی شیک و کیفیت خوب. فقط کاش حجمش کمی بیشتر بود.", verified: true },
+  { name: "مریم صالحی", rating: 5, date: "۲۷ اردیبهشت ۱۴۰۴", title: "تجربه عالی", text: "ارسال سریع، اصالت محصول تأیید شده و نتیجه‌ش روی پوستم خیلی خوب بود.", verified: false },
+];
+
+export function getProductDetail(p: Product): ProductDetail {
+  return {
+    description:
+      `${p.title} از برند ${p.brand} با فرمولاسیون پیشرفته و ترکیبات طبیعی، تجربه‌ای لوکس از مراقبت روزانه را برای شما به ارمغان می‌آورد. این محصول با تست‌های درماتولوژی تأیید شده و برای استفاده روزانه مناسب است.`,
+    highlights: [
+      "آبرسانی عمیق و طولانی‌مدت",
+      "بدون پارابن و سولفات",
+      "تست شده زیر نظر متخصص پوست",
+      "بسته‌بندی لوکس و قابل بازیافت",
+      "ماندگاری بالا و جذب سریع",
+    ],
+    ingredients: [
+      "عصاره گل رز دمشقی",
+      "هیالورونیک اسید",
+      "ویتامین E و B5",
+      "روغن جوجوبا",
+      "نیاسینامید ۵٪",
+      "گلیسیرین گیاهی",
+    ],
+    usage: [
+      "پوست را با پاک‌کننده ملایم شست‌وشو دهید.",
+      "مقدار کمی از محصول را روی صورت و گردن قرار دهید.",
+      "با حرکات دایره‌ای ملایم ماساژ دهید تا کاملاً جذب شود.",
+      "صبح و شب به‌صورت روتین استفاده کنید؛ روزها همراه با ضدآفتاب.",
+    ],
+    suitableFor: ["پوست خشک", "پوست معمولی", "پوست حساس", "پوست مختلط"],
+    specs: [
+      { label: "برند", value: p.brand },
+      { label: "دسته‌بندی", value: p.category },
+      { label: "حجم", value: "۵۰ میلی‌لیتر" },
+      { label: "کشور سازنده", value: "فرانسه" },
+      { label: "تاریخ انقضا", value: "۳۶ ماه پس از تولید" },
+      { label: "کد محصول", value: `GLS-${p.id.padStart(4, "0")}` },
+    ],
+    variants: [
+      { label: "صورتی", color: "#f9b4c4" },
+      { label: "سبز", color: "#b6dcb4" },
+      { label: "نارنجی", color: "#f6c48a" },
+      { label: "آبی", color: "#aac9e6" },
+    ],
+    gallery: [p.image, p.image, p.image, p.image],
+    reviews: DEFAULT_REVIEWS,
+  };
+}
