@@ -9,7 +9,7 @@ import { Footer } from "@/components/site/footer";
 import { ProductGallery } from "@/components/site/product-gallery";
 import { ReviewForm } from "@/components/site/review-form";
 import { ProductCard } from "@/components/site/product-card";
-import { PRODUCTS, formatToman, getProductDetail } from "@/lib/mock-data";
+import { PRODUCTS, formatToman, getProductDetail, type Product, type ProductDetail } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/product/$slug")({
   loader: ({ params }) => {
@@ -69,7 +69,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 function ProductPage() {
-  const { product: p, detail } = Route.useLoaderData();
+  const { product: p, detail } = Route.useLoaderData() as { product: Product; detail: ProductDetail };
   const [qty, setQty] = useState(1);
   const [variant, setVariant] = useState(0);
   const [tab, setTab] = useState<TabId>("desc");
