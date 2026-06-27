@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -23,6 +24,11 @@ import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
+  '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
+  '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/privacy': typeof PrivacyRoute
+  '/shipping': typeof ShippingRoute
   '/terms': typeof TermsRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$slug': typeof ProductSlugRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/privacy'
+    | '/shipping'
     | '/terms'
     | '/category/$slug'
     | '/product/$slug'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/privacy'
+    | '/shipping'
     | '/terms'
     | '/category/$slug'
     | '/product/$slug'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/privacy'
+    | '/shipping'
     | '/terms'
     | '/category/$slug'
     | '/product/$slug'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   PrivacyRoute: typeof PrivacyRoute
+  ShippingRoute: typeof ShippingRoute
   TermsRoute: typeof TermsRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   PrivacyRoute: PrivacyRoute,
+  ShippingRoute: ShippingRoute,
   TermsRoute: TermsRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductSlugRoute: ProductSlugRoute,
