@@ -9,7 +9,7 @@ import { fetchActiveProducts, dbToCardProduct } from "@/lib/products-api";
 function useDBProducts() {
   return useQuery({
     queryKey: ["products"],
-    queryFn: fetchActiveProducts,
+    queryFn: () => fetchActiveProducts(),
     staleTime: 30_000,
   });
 }
