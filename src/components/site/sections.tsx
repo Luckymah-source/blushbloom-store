@@ -206,28 +206,34 @@ export function NewsletterSection() {
 }
 
 export function FeaturedProducts() {
+  const { data, isLoading } = useDBProducts();
+  const items = (data ?? []).map(dbToCardProduct);
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
       <SectionHeader eyebrow="منتخب آشنا پرفیوم" title="محصولات ویژه" href="/category/skincare" />
-      <ProductGrid items={PRODUCTS.slice(0, 4)} />
+      {isLoading ? <ProductGridSkeleton /> : <ProductGrid items={items.slice(0, 4)} />}
     </section>
   );
 }
 
 export function NewArrivals() {
+  const { data, isLoading } = useDBProducts();
+  const items = (data ?? []).map(dbToCardProduct);
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
       <SectionHeader eyebrow="تازه رسیده‌ها" title="جدیدترین محصولات" href="/category/makeup" />
-      <ProductGrid items={PRODUCTS.slice(4, 8)} />
+      {isLoading ? <ProductGridSkeleton /> : <ProductGrid items={items.slice(0, 4)} />}
     </section>
   );
 }
 
 export function BestSellers() {
+  const { data, isLoading } = useDBProducts();
+  const items = (data ?? []).map(dbToCardProduct);
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
       <SectionHeader eyebrow="پرفروش‌ترین‌ها" title="انتخاب مشتریان" href="/category/perfume" />
-      <ProductGrid items={[...PRODUCTS].sort((a, b) => b.sold - a.sold).slice(0, 4)} />
+      {isLoading ? <ProductGridSkeleton /> : <ProductGrid items={items.slice(0, 4)} />}
     </section>
   );
 }
