@@ -3,6 +3,31 @@ import { ChevronLeft, Star, Quote } from "lucide-react";
 import { ProductCard } from "./product-card";
 import { CATEGORIES, BRANDS, PRODUCTS, POSTS, TESTIMONIALS, FAQS, type Product } from "@/lib/mock-data";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchActiveProducts, dbToCardProduct } from "@/lib/products-api";
+
+function useDBProducts() {
+  return useQuery({
+    queryKey: ["products"],
+    queryFn: () => fetchActiveProducts(),
+    staleTime: 30_000,
+  });
+}
+
+function ProductGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="rounded-3xl border border-border bg-card p-3 animate-pulse">
+          <div className="aspect-square rounded-2xl bg-rose-soft/40" />
+          <div className="h-3 mt-3 rounded bg-rose-soft/60 w-1/3" />
+          <div className="h-4 mt-2 rounded bg-rose-soft/60 w-3/4" />
+          <div className="h-4 mt-3 rounded bg-rose-soft/60 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function SectionHeader({ eyebrow, title, href }: { eyebrow?: string; title: string; href?: string }) {
   return (
@@ -181,28 +206,34 @@ export function NewsletterSection() {
 }
 
 export function FeaturedProducts() {
+  const { data, isLoading } = useDBProducts();
+  const items = (data ?? []).map(dbToCardProduct);
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
       <SectionHeader eyebrow="منتخب آشنا پرفیوم" title="محصولات ویژه" href="/category/skincare" />
-      <ProductGrid items={PRODUCTS.slice(0, 4)} />
+      {isLoading ? <ProductGridSkeleton /> : <ProductGrid items={items.slice(0, 4)} />}
     </section>
   );
 }
 
 export function NewArrivals() {
+  const { data, isLoading } = useDBProducts();
+  const items = (data ?? []).map(dbToCardProduct);
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
       <SectionHeader eyebrow="تازه رسیده‌ها" title="جدیدترین محصولات" href="/category/makeup" />
-      <ProductGrid items={PRODUCTS.slice(4, 8)} />
+      {isLoading ? <ProductGridSkeleton /> : <ProductGrid items={items.slice(0, 4)} />}
     </section>
   );
 }
 
 export function BestSellers() {
+  const { data, isLoading } = useDBProducts();
+  const items = (data ?? []).map(dbToCardProduct);
   return (
     <section className="mx-auto max-w-7xl px-4 mt-14">
       <SectionHeader eyebrow="پرفروش‌ترین‌ها" title="انتخاب مشتریان" href="/category/perfume" />
-      <ProductGrid items={[...PRODUCTS].sort((a, b) => b.sold - a.sold).slice(0, 4)} />
+      {isLoading ? <ProductGridSkeleton /> : <ProductGrid items={items.slice(0, 4)} />}
     </section>
   );
 }

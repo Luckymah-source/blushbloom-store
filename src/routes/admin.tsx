@@ -1,5 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import {
+  fetchAllProductsAdmin,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  checkIsAdmin,
+  type DBProduct,
+  type ProductInput,
+} from "@/lib/products-api";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -8,105 +20,8 @@ export const Route = createFileRoute("/admin")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: AdminPanel,
+  component: AdminPage,
 });
-
-const ADMIN_USERNAME = "admin";
-const ADMIN_PASSWORD = "Mahan824";
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "9px 12px",
-  borderRadius: 8,
-  border: "1px solid #e8d5df",
-  fontSize: 13,
-  background: "#fff",
-  outline: "none",
-  fontFamily: "inherit",
-  boxSizing: "border-box",
-};
-
-const selectStyle: React.CSSProperties = { ...inputStyle, cursor: "pointer" };
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 12, color: "#666", marginBottom: 5, fontWeight: 600 }}>{children}</div>;
-}
-
-function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} style={{ ...inputStyle, ...(props.style || {}) }} />;
-}
-
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [showPass, setShowPass] = useState(false);
-
-  function handleLogin() {
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      onLogin();
-    } else {
-      setError("نام کاربری یا رمز عبور اشتباه است.");
-    }
-  }
-
-  return (
-    <div dir="rtl" style={{ fontFamily: "'Vazirmatn', Tahoma, sans-serif", minHeight: "100vh", background: "linear-gradient(135deg, #fdf0f5 0%, #f5e6f0 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-      <div style={{ background: "#fff", borderRadius: 20, padding: 36, width: "100%", maxWidth: 380, boxShadow: "0 8px 40px rgba(180,80,120,0.12)" }}>
-        <div style={{ textAlign: "center", marginBottom: 28 }}>
-          <div style={{ width: 60, height: 60, background: "linear-gradient(135deg, #c96b8a, #8b4e6b)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, color: "#fff", margin: "0 auto 12px" }}>آ</div>
-          <div style={{ fontWeight: 800, fontSize: 18, color: "#8b4e6b" }}>آشنا پرفیوم</div>
-          <div style={{ fontSize: 12, color: "#aaa", marginTop: 4 }}>ورود به پنل مدیریت</div>
-        </div>
-
-        <div style={{ marginBottom: 14 }}>
-          <Label>نام کاربری</Label>
-          <input
-            value={username}
-            onChange={(e) => { setUsername(e.target.value); setError(""); }}
-            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            placeholder="admin"
-            style={inputStyle}
-          />
-        </div>
-
-        <div style={{ marginBottom: 20 }}>
-          <Label>رمز عبور</Label>
-          <div style={{ position: "relative" }}>
-            <input
-              type={showPass ? "text" : "password"}
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(""); }}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              placeholder="••••••••"
-              style={{ ...inputStyle, paddingLeft: 40 }}
-            />
-            <button
-              onClick={() => setShowPass(!showPass)}
-              type="button"
-              style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#aaa", fontSize: 14 }}
-            >
-              {showPass ? "🙈" : "👁️"}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div style={{ background: "#fce8e8", color: "#c0392b", padding: "8px 12px", borderRadius: 8, fontSize: 13, marginBottom: 14, textAlign: "center" }}>
-            {error}
-          </div>
-        )}
-
-        <button
-          onClick={handleLogin}
-          style={{ width: "100%", background: "linear-gradient(135deg, #c96b8a, #8b4e6b)", color: "#fff", border: "none", borderRadius: 10, padding: "12px", fontWeight: 700, cursor: "pointer", fontSize: 15 }}
-        >
-          ورود
-        </button>
-      </div>
-    </div>
-  );
-}
 
 const CATEGORIES = [
   { value: "perfume", label: "عطر و ادکلن" },
@@ -116,317 +31,367 @@ const CATEGORIES = [
   { value: "hair", label: "مراقبت از مو" },
   { value: "body", label: "بدن و حمام" },
 ];
+const BRANDS = ["آشنا پرفیوم", "لومیه", "پاریس بل", "اسکین لب", "رزا", "نیووآ", "بل‌فام", "اوریفلیم"];
+const BADGES = ["", "پرفروش", "جدید", "تخفیف", "ویژه"];
 
-const BRANDS = [
-  "آشنا پرفیوم", "لومیه", "پاریس بل", "اسکین لب", "رزا", "نیووآ", "بل‌فام", "اوریفلیم",
-];
+function fa(n: number | null | undefined) {
+  if (n == null) return "—";
+  return Number(n).toLocaleString("fa-IR") + " تومان";
+}
+function catLabel(v: string) {
+  return CATEGORIES.find((c) => c.value === v)?.label || v;
+}
+function slugify(s: string) {
+  return s.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-_\u0600-\u06FF]/g, "");
+}
 
-type ProductRow = {
-  id: string;
-  name: string;
-  brand: string;
-  category: string;
-  price: number;
-  discountPrice: number | null;
-  stock: number;
-  description: string;
-  badge: string;
-  image: string;
-};
+type AuthState = "loading" | "anon" | "user" | "admin";
 
-const INITIAL_PRODUCTS: ProductRow[] = [
-  { id: "pink-rose-cream", name: "کرم آبرسان رز صورتی", brand: "آشنا پرفیوم", category: "skincare", price: 720000, discountPrice: 580000, stock: 15, description: "کرم آبرسان با عصاره گل رز برای پوست‌های خشک و نیمه خشک", badge: "پرفروش", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop" },
-  { id: "matte-lipstick-velvet", name: "رژ لب مات ولوت", brand: "لومیه", category: "lips", price: 390000, discountPrice: 320000, stock: 28, description: "رژ لب مات با ماندگاری بالا و بافت مخملی", badge: "تخفیف", image: "https://images.unsplash.com/photo-1586495777744-4e6232bf2b4e?w=300&h=300&fit=crop" },
-  { id: "rose-perfume", name: "عطر زنانه رز فرنچ", brand: "پاریس بل", category: "perfume", price: 1450000, discountPrice: null, stock: 8, description: "عطر زنانه با رایحه گل رز فرانسوی، ماندگاری بالا", badge: "ویژه", image: "https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?w=300&h=300&fit=crop" },
-  { id: "vitamin-c-serum", name: "سرم ویتامین C درخشان‌کننده", brand: "اسکین لب", category: "skincare", price: 850000, discountPrice: 690000, stock: 20, description: "سرم ویتامین C برای روشن‌سازی و یکنواخت کردن رنگ پوست", badge: "جدید", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=300&h=300&fit=crop" },
-  { id: "body-mist-pink", name: "بادی اسپلش صورتی", brand: "آشنا پرفیوم", category: "body", price: 350000, discountPrice: 280000, stock: 35, description: "اسپری بدن با رایحه گل‌های بهاری، مناسب استفاده روزانه", badge: "تخفیف", image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=300&h=300&fit=crop" },
-];
+function AdminPage() {
+  const navigate = useNavigate();
+  const [authState, setAuthState] = useState<AuthState>("loading");
+  const [userEmail, setUserEmail] = useState<string>("");
 
-type FormState = {
-  id: string;
-  name: string;
-  brand: string;
-  category: string;
-  price: string;
-  discountPrice: string;
-  stock: string;
-  description: string;
-  badge: string;
-  image: string;
-};
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!mounted) return;
+      if (!data.user) {
+        setAuthState("anon");
+        return;
+      }
+      setUserEmail(data.user.email || "");
+      const isAdmin = await checkIsAdmin(data.user.id);
+      if (!mounted) return;
+      setAuthState(isAdmin ? "admin" : "user");
+    };
+    check();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => check());
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
-const EMPTY_FORM: FormState = {
-  id: "",
+  if (authState === "loading") {
+    return <div className="min-h-screen grid place-items-center text-muted-foreground">در حال بارگذاری...</div>;
+  }
+  if (authState === "anon") {
+    return (
+      <div className="min-h-screen grid place-items-center px-4 bg-rose-soft/30">
+        <div className="max-w-md text-center bg-card rounded-3xl border border-border p-8 shadow-soft">
+          <div className="mx-auto w-14 h-14 rounded-full bg-primary text-primary-foreground grid place-items-center text-2xl font-black mb-4">آ</div>
+          <h1 className="text-xl font-black mb-2">پنل مدیریت آشنا پرفیوم</h1>
+          <p className="text-sm text-muted-foreground mb-6">برای دسترسی، ابتدا وارد حساب ادمین شوید.</p>
+          <button onClick={() => navigate({ to: "/auth", search: { redirect: "/admin" } })}
+            className="w-full rounded-xl bg-primary text-primary-foreground py-3 text-sm font-bold hover:opacity-90">
+            ورود به حساب
+          </button>
+          <Link to="/" className="block mt-4 text-xs text-muted-foreground hover:text-primary">بازگشت به فروشگاه</Link>
+        </div>
+      </div>
+    );
+  }
+  if (authState === "user") {
+    return (
+      <div className="min-h-screen grid place-items-center px-4 bg-rose-soft/30">
+        <div className="max-w-md text-center bg-card rounded-3xl border border-border p-8 shadow-soft">
+          <div className="text-5xl mb-3">🚫</div>
+          <h1 className="text-xl font-black mb-2">دسترسی محدود</h1>
+          <p className="text-sm text-muted-foreground mb-2">حساب <span dir="ltr" className="font-mono">{userEmail}</span> دسترسی ادمین ندارد.</p>
+          <p className="text-xs text-muted-foreground mb-6">برای تبدیل این حساب به ادمین، با مدیر سیستم تماس بگیرید.</p>
+          <button onClick={async () => { await supabase.auth.signOut(); }}
+            className="w-full rounded-xl bg-secondary text-secondary-foreground py-3 text-sm font-bold hover:opacity-90">
+            خروج از حساب
+          </button>
+          <Link to="/" className="block mt-4 text-xs text-muted-foreground hover:text-primary">بازگشت به فروشگاه</Link>
+        </div>
+      </div>
+    );
+  }
+
+  return <AdminDashboard email={userEmail} />;
+}
+
+const EMPTY_FORM = {
+  slug: "",
   name: "",
   brand: BRANDS[0],
   category: "perfume",
   price: "",
-  discountPrice: "",
+  discount_price: "",
   stock: "",
   description: "",
   badge: "",
   image: "",
+  is_active: true,
 };
 
-function formatPrice(p: number | null | undefined) {
-  if (!p) return "—";
-  return Number(p).toLocaleString("fa-IR") + " تومان";
-}
-
-function getCategoryLabel(val: string) {
-  return CATEGORIES.find((c) => c.value === val)?.label || val;
-}
-
-function AdminPanel() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [products, setProducts] = useState<ProductRow[]>(INITIAL_PRODUCTS);
+function AdminDashboard({ email }: { email: string }) {
+  const qc = useQueryClient();
   const [view, setView] = useState<"list" | "form" | "delete">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [form, setForm] = useState(EMPTY_FORM);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("all");
-  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
-  function showToast(msg: string, type: "success" | "error" = "success") {
-    setToast({ msg, type });
-    setTimeout(() => setToast(null), 2800);
-  }
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ["admin-products"],
+    queryFn: fetchAllProductsAdmin,
+  });
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["admin-products"] });
+    qc.invalidateQueries({ queryKey: ["products"] });
+  };
+
+  const createMut = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => { invalidate(); toast.success("محصول جدید اضافه شد ✓"); setView("list"); },
+    onError: (e: Error) => toast.error("خطا در افزودن: " + e.message),
+  });
+  const updateMut = useMutation({
+    mutationFn: ({ id, input }: { id: string; input: Partial<ProductInput> }) => updateProduct(id, input),
+    onSuccess: () => { invalidate(); toast.success("محصول ویرایش شد ✓"); setView("list"); },
+    onError: (e: Error) => toast.error("خطا در ویرایش: " + e.message),
+  });
+  const deleteMut = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => { invalidate(); toast.success("محصول حذف شد"); setView("list"); setDeleteId(null); },
+    onError: (e: Error) => toast.error("خطا در حذف: " + e.message),
+  });
 
   function openAdd() {
-    setForm({ ...EMPTY_FORM, id: "product-" + Date.now() });
+    setForm({ ...EMPTY_FORM });
     setEditingId(null);
     setView("form");
   }
-
-  function openEdit(p: ProductRow) {
+  function openEdit(p: DBProduct) {
     setForm({
-      ...p,
+      slug: p.slug,
+      name: p.name,
+      brand: p.brand,
+      category: p.category,
       price: String(p.price),
-      discountPrice: p.discountPrice ? String(p.discountPrice) : "",
+      discount_price: p.discount_price != null ? String(p.discount_price) : "",
       stock: String(p.stock),
+      description: p.description || "",
+      badge: p.badge || "",
+      image: p.image || "",
+      is_active: p.is_active,
     });
     setEditingId(p.id);
     setView("form");
   }
-
-  function openDelete(id: string) {
-    setDeleteId(id);
-    setView("delete");
-  }
-
   function handleSave() {
     if (!form.name || !form.price || !form.stock) {
-      showToast("لطفاً نام، قیمت و موجودی را وارد کنید.", "error");
+      toast.error("نام، قیمت و موجودی الزامی است.");
       return;
     }
-    const saved: ProductRow = {
-      id: form.id,
+    const slug = form.slug || slugify(form.name) || "product-" + Date.now();
+    const input: ProductInput = {
+      slug,
       name: form.name,
       brand: form.brand,
       category: form.category,
-      description: form.description,
-      badge: form.badge,
-      image: form.image,
       price: Number(form.price),
-      discountPrice: form.discountPrice ? Number(form.discountPrice) : null,
+      discount_price: form.discount_price ? Number(form.discount_price) : null,
       stock: Number(form.stock),
+      description: form.description || null,
+      badge: form.badge || null,
+      image: form.image || null,
+      is_active: form.is_active,
     };
-    if (editingId) {
-      setProducts((prev) => prev.map((p) => (p.id === editingId ? saved : p)));
-      showToast("محصول با موفقیت ویرایش شد ✓");
-    } else {
-      setProducts((prev) => [saved, ...prev]);
-      showToast("محصول جدید اضافه شد ✓");
-    }
-    setView("list");
-  }
-
-  function handleDelete() {
-    setProducts((prev) => prev.filter((p) => p.id !== deleteId));
-    showToast("محصول حذف شد.", "error");
-    setView("list");
-    setDeleteId(null);
+    if (editingId) updateMut.mutate({ id: editingId, input });
+    else createMut.mutate(input);
   }
 
   const filtered = products.filter((p) => {
-    const matchSearch = p.name.includes(search) || p.brand.includes(search);
-    const matchCat = filterCat === "all" || p.category === filterCat;
-    return matchSearch && matchCat;
+    const s = search.trim();
+    const matchS = !s || p.name.includes(s) || p.brand.includes(s);
+    const matchC = filterCat === "all" || p.category === filterCat;
+    return matchS && matchC;
   });
-
   const totalStock = products.reduce((s, p) => s + p.stock, 0);
   const lowStock = products.filter((p) => p.stock < 10).length;
 
-  if (!loggedIn) return <LoginScreen onLogin={() => setLoggedIn(true)} />;
-
   return (
-    <div dir="rtl" style={{ fontFamily: "'Vazirmatn', Tahoma, sans-serif", minHeight: "100vh", background: "#fdf6f9", color: "#1a1a2e" }}>
-      <div style={{ background: "linear-gradient(135deg, #c96b8a 0%, #8b4e6b 100%)", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 2px 12px rgba(140,60,90,0.15)", flexWrap: "wrap", gap: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, background: "rgba(255,255,255,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, color: "#fff" }}>آ</div>
-          <div>
-            <div style={{ color: "#fff", fontWeight: 700, fontSize: 16 }}>آشنا پرفیوم</div>
-            <div style={{ color: "rgba(255,255,255,0.75)", fontSize: 11 }}>پنل مدیریت محصولات</div>
+    <div dir="rtl" className="min-h-screen bg-rose-soft/20">
+      <header className="bg-gradient-to-l from-primary to-rose-glow text-primary-foreground shadow-soft">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/25 grid place-items-center text-lg font-black">آ</div>
+            <div>
+              <div className="font-black text-base">پنل مدیریت آشنا پرفیوم</div>
+              <div className="text-[11px] opacity-80" dir="ltr">{email}</div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {view === "list" && (
+              <button onClick={openAdd} className="bg-white text-primary rounded-xl px-4 py-2 text-sm font-bold hover:opacity-90">+ افزودن محصول</button>
+            )}
+            {view !== "list" && (
+              <button onClick={() => setView("list")} className="bg-white/15 border border-white/30 rounded-xl px-4 py-2 text-sm hover:bg-white/25">← بازگشت</button>
+            )}
+            <Link to="/" className="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs hover:bg-white/20">سایت</Link>
+            <button onClick={async () => { await supabase.auth.signOut(); }} className="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs hover:bg-white/20">خروج</button>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          {view === "list" && (
-            <button onClick={openAdd} style={{ background: "#fff", color: "#c96b8a", border: "none", borderRadius: 8, padding: "8px 18px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
-              + افزودن محصول
-            </button>
-          )}
-          {view !== "list" && (
-            <button onClick={() => setView("list")} style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontSize: 13 }}>
-              ← بازگشت
-            </button>
-          )}
-          <button onClick={() => setLoggedIn(false)} style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 8, padding: "7px 14px", cursor: "pointer", fontSize: 12 }}>
-            خروج
-          </button>
-        </div>
-      </div>
+      </header>
 
-      {toast && (
-        <div style={{ position: "fixed", top: 72, right: 24, background: toast.type === "error" ? "#e53e3e" : "#38a169", color: "#fff", padding: "10px 20px", borderRadius: 8, zIndex: 999, fontSize: 13, boxShadow: "0 4px 16px rgba(0,0,0,0.15)" }}>
-          {toast.msg}
-        </div>
-      )}
-
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "24px 16px" }}>
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {view === "list" && (
           <>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
-              {[
-                { label: "کل محصولات", value: String(products.length), color: "#c96b8a" },
-                { label: "موجودی کل", value: totalStock + " عدد", color: "#6b8bc9" },
-                { label: "موجودی کم", value: lowStock + " محصول", color: lowStock > 0 ? "#e07a3a" : "#38a169" },
-              ].map((s) => (
-                <div key={s.label} style={{ background: "#fff", borderRadius: 12, padding: "14px 16px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)", borderTop: `3px solid ${s.color}` }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
-                  <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{s.label}</div>
-                </div>
-              ))}
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <StatCard label="کل محصولات" value={products.length.toLocaleString("fa-IR")} color="bg-primary" />
+              <StatCard label="موجودی کل" value={totalStock.toLocaleString("fa-IR") + " عدد"} color="bg-blue-500" />
+              <StatCard label="موجودی کم" value={lowStock.toLocaleString("fa-IR") + " محصول"} color={lowStock > 0 ? "bg-orange-500" : "bg-green-500"} />
             </div>
 
-            <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
-              <input
-                placeholder="جستجو در نام یا برند..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ flex: 1, minWidth: 180, padding: "9px 14px", borderRadius: 8, border: "1px solid #e8d5df", fontSize: 13, background: "#fff", outline: "none" }}
-              />
-              <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)} style={{ padding: "9px 14px", borderRadius: 8, border: "1px solid #e8d5df", fontSize: 13, background: "#fff", cursor: "pointer" }}>
+            <div className="flex gap-2 mb-4 flex-wrap">
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="جستجو در نام یا برند..."
+                className="flex-1 min-w-[180px] rounded-xl border border-border bg-card px-4 py-2 text-sm outline-none focus:border-primary" />
+              <select value={filterCat} onChange={(e) => setFilterCat(e.target.value)}
+                className="rounded-xl border border-border bg-card px-4 py-2 text-sm">
                 <option value="all">همه دسته‌ها</option>
                 {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {filtered.length === 0 && (
-                <div style={{ textAlign: "center", color: "#aaa", padding: 40, background: "#fff", borderRadius: 12 }}>محصولی یافت نشد</div>
-              )}
-              {filtered.map((p) => (
-                <div key={p.id} style={{ background: "#fff", borderRadius: 12, padding: "14px 16px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-                  <img src={p.image || "https://via.placeholder.com/60"} alt={p.name} style={{ width: 60, height: 60, borderRadius: 8, objectFit: "cover", flexShrink: 0, border: "1px solid #f0dce6" }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                      <span style={{ fontWeight: 700, fontSize: 14 }}>{p.name}</span>
-                      {p.badge && <span style={{ background: "#fce4ec", color: "#c96b8a", fontSize: 10, padding: "2px 7px", borderRadius: 20, fontWeight: 600 }}>{p.badge}</span>}
+            {isLoading ? (
+              <div className="text-center py-12 text-muted-foreground">در حال بارگذاری محصولات...</div>
+            ) : filtered.length === 0 ? (
+              <div className="text-center py-12 bg-card rounded-2xl text-muted-foreground">محصولی یافت نشد</div>
+            ) : (
+              <div className="space-y-2">
+                {filtered.map((p) => (
+                  <div key={p.id} className="bg-card rounded-2xl border border-border p-3 flex items-center gap-3 flex-wrap">
+                    <img src={p.image || "https://placehold.co/60"} alt={p.name}
+                      className="w-14 h-14 rounded-xl object-cover border border-border shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-sm">{p.name}</span>
+                        {p.badge && <span className="text-[10px] bg-rose-soft text-primary px-2 py-0.5 rounded-full font-bold">{p.badge}</span>}
+                        {!p.is_active && <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full">غیرفعال</span>}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-0.5">{p.brand} • {catLabel(p.category)}</div>
+                      <div className="flex gap-3 mt-1 text-xs flex-wrap">
+                        <span className={p.discount_price ? "text-muted-foreground line-through" : "text-primary font-bold"}>{fa(p.price)}</span>
+                        {p.discount_price && <span className="text-primary font-bold">{fa(p.discount_price)}</span>}
+                        <span className={p.stock < 10 ? "text-orange-600" : "text-green-600"}>موجودی: {p.stock.toLocaleString("fa-IR")}</span>
+                      </div>
                     </div>
-                    <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{p.brand} • {getCategoryLabel(p.category)}</div>
-                    <div style={{ display: "flex", gap: 12, marginTop: 4, fontSize: 12, flexWrap: "wrap" }}>
-                      <span style={{ color: p.discountPrice ? "#999" : "#c96b8a", textDecoration: p.discountPrice ? "line-through" : "none" }}>{formatPrice(p.price)}</span>
-                      {p.discountPrice && <span style={{ color: "#c96b8a", fontWeight: 700 }}>{formatPrice(p.discountPrice)}</span>}
-                      <span style={{ color: p.stock < 10 ? "#e07a3a" : "#38a169" }}>موجودی: {p.stock}</span>
+                    <div className="flex gap-2 shrink-0">
+                      <button onClick={() => openEdit(p)} className="bg-secondary text-secondary-foreground rounded-lg px-3 py-1.5 text-xs font-bold hover:opacity-80">ویرایش</button>
+                      <button onClick={() => { setDeleteId(p.id); setView("delete"); }} className="bg-destructive/10 text-destructive rounded-lg px-3 py-1.5 text-xs font-bold hover:bg-destructive/20">حذف</button>
                     </div>
                   </div>
-                  <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-                    <button onClick={() => openEdit(p)} style={{ background: "#f0e9f5", color: "#8b4e6b", border: "none", borderRadius: 7, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>ویرایش</button>
-                    <button onClick={() => openDelete(p.id)} style={{ background: "#fce8e8", color: "#c0392b", border: "none", borderRadius: 7, padding: "7px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600 }}>حذف</button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </>
         )}
 
         {view === "form" && (
-          <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}>
-            <h2 style={{ margin: "0 0 20px", fontSize: 17, color: "#8b4e6b" }}>{editingId ? "ویرایش محصول" : "افزودن محصول جدید"}</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-              <div style={{ gridColumn: "1 / -1" }}>
-                <Label>نام محصول *</Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="مثلاً: عطر زنانه رز فرنچ" />
-              </div>
-              <div>
-                <Label>برند *</Label>
-                <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} style={selectStyle}>
+          <div className="bg-card rounded-3xl border border-border p-6 max-w-3xl mx-auto">
+            <h2 className="text-lg font-black text-primary mb-5">{editingId ? "ویرایش محصول" : "افزودن محصول جدید"}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field label="نام محصول *" full>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} placeholder="مثلاً: عطر زنانه رز فرنچ" />
+              </Field>
+              <Field label="اسلاگ (URL)" full>
+                <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} className={inputCls} dir="ltr" placeholder="rose-perfume (اختیاری — خودکار ساخته می‌شود)" />
+              </Field>
+              <Field label="برند *">
+                <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className={inputCls}>
                   {BRANDS.map((b) => <option key={b}>{b}</option>)}
                 </select>
-              </div>
-              <div>
-                <Label>دسته‌بندی *</Label>
-                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} style={selectStyle}>
+              </Field>
+              <Field label="دسته‌بندی *">
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={inputCls}>
                   {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
-              </div>
-              <div>
-                <Label>قیمت (تومان) *</Label>
-                <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="مثلاً: 1450000" />
-              </div>
-              <div>
-                <Label>قیمت با تخفیف (تومان)</Label>
-                <Input type="number" value={form.discountPrice} onChange={(e) => setForm({ ...form, discountPrice: e.target.value })} placeholder="اختیاری" />
-              </div>
-              <div>
-                <Label>موجودی *</Label>
-                <Input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} placeholder="تعداد" />
-              </div>
-              <div>
-                <Label>برچسب</Label>
-                <select value={form.badge} onChange={(e) => setForm({ ...form, badge: e.target.value })} style={selectStyle}>
-                  <option value="">بدون برچسب</option>
-                  {["پرفروش", "جدید", "تخفیف", "ویژه"].map((b) => <option key={b}>{b}</option>)}
+              </Field>
+              <Field label="قیمت (تومان) *">
+                <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className={inputCls} placeholder="1450000" />
+              </Field>
+              <Field label="قیمت با تخفیف (تومان)">
+                <input type="number" value={form.discount_price} onChange={(e) => setForm({ ...form, discount_price: e.target.value })} className={inputCls} placeholder="اختیاری" />
+              </Field>
+              <Field label="موجودی *">
+                <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className={inputCls} placeholder="تعداد" />
+              </Field>
+              <Field label="برچسب">
+                <select value={form.badge} onChange={(e) => setForm({ ...form, badge: e.target.value })} className={inputCls}>
+                  {BADGES.map((b) => <option key={b} value={b}>{b || "بدون برچسب"}</option>)}
                 </select>
-              </div>
-              <div style={{ gridColumn: "1 / -1" }}>
-                <Label>لینک تصویر</Label>
-                <Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://..." />
-              </div>
+              </Field>
+              <Field label="لینک تصویر" full>
+                <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} dir="ltr" placeholder="https://..." />
+              </Field>
               {form.image && (
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <img src={form.image} alt="پیش‌نمایش" style={{ width: 100, height: 100, objectFit: "cover", borderRadius: 8, border: "1px solid #f0dce6" }} onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
+                <div className="md:col-span-2">
+                  <img src={form.image} alt="پیش‌نمایش" className="w-24 h-24 rounded-xl object-cover border border-border" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
                 </div>
               )}
-              <div style={{ gridColumn: "1 / -1" }}>
-                <Label>توضیحات</Label>
-                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="توضیح کوتاه درباره محصول..." rows={3} style={{ ...inputStyle, resize: "vertical" }} />
-              </div>
+              <Field label="توضیحات" full>
+                <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} placeholder="توضیح کوتاه..." />
+              </Field>
+              <Field label="وضعیت" full>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4" />
+                  محصول فعال (در سایت نمایش داده شود)
+                </label>
+              </Field>
             </div>
-            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button onClick={handleSave} style={{ background: "linear-gradient(135deg, #c96b8a, #8b4e6b)", color: "#fff", border: "none", borderRadius: 8, padding: "10px 28px", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>
-                {editingId ? "ذخیره تغییرات" : "افزودن محصول"}
+            <div className="flex gap-3 mt-6">
+              <button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}
+                className="bg-primary text-primary-foreground rounded-xl px-6 py-2.5 text-sm font-bold hover:opacity-90 disabled:opacity-60">
+                {createMut.isPending || updateMut.isPending ? "در حال ذخیره..." : editingId ? "ذخیره تغییرات" : "افزودن محصول"}
               </button>
-              <button onClick={() => setView("list")} style={{ background: "#f5f5f5", color: "#555", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontSize: 14 }}>
-                انصراف
-              </button>
+              <button onClick={() => setView("list")} className="bg-secondary text-secondary-foreground rounded-xl px-5 py-2.5 text-sm hover:opacity-80">انصراف</button>
             </div>
           </div>
         )}
 
         {view === "delete" && (
-          <div style={{ background: "#fff", borderRadius: 16, padding: 32, textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.07)", maxWidth: 400, margin: "40px auto" }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>🗑️</div>
-            <h3 style={{ margin: "0 0 8px", color: "#c0392b" }}>حذف محصول</h3>
-            <p style={{ color: "#666", fontSize: 14, marginBottom: 24 }}>آیا مطمئن هستید؟ این عملیات قابل بازگشت نیست.</p>
-            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-              <button onClick={handleDelete} style={{ background: "#e53e3e", color: "#fff", border: "none", borderRadius: 8, padding: "10px 24px", fontWeight: 700, cursor: "pointer" }}>بله، حذف شود</button>
-              <button onClick={() => setView("list")} style={{ background: "#f5f5f5", color: "#555", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer" }}>انصراف</button>
+          <div className="bg-card rounded-3xl border border-border p-8 max-w-md mx-auto mt-12 text-center">
+            <div className="text-5xl mb-3">🗑️</div>
+            <h3 className="text-lg font-black text-destructive mb-2">حذف محصول</h3>
+            <p className="text-sm text-muted-foreground mb-6">آیا مطمئن هستید؟ این عملیات قابل بازگشت نیست.</p>
+            <div className="flex gap-2 justify-center">
+              <button onClick={() => deleteId && deleteMut.mutate(deleteId)} disabled={deleteMut.isPending}
+                className="bg-destructive text-destructive-foreground rounded-xl px-5 py-2.5 text-sm font-bold hover:opacity-90 disabled:opacity-60">
+                {deleteMut.isPending ? "..." : "بله، حذف شود"}
+              </button>
+              <button onClick={() => setView("list")} className="bg-secondary text-secondary-foreground rounded-xl px-5 py-2.5 text-sm">انصراف</button>
             </div>
           </div>
         )}
-      </div>
+      </main>
+    </div>
+  );
+}
+
+const inputCls = "w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary";
+
+function Field({ label, full, children }: { label: string; full?: boolean; children: React.ReactNode }) {
+  return (
+    <div className={full ? "md:col-span-2" : ""}>
+      <label className="block text-xs font-bold text-muted-foreground mb-1.5">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="bg-card rounded-2xl border border-border p-4 relative overflow-hidden">
+      <div className={`absolute top-0 inset-x-0 h-1 ${color}`} />
+      <div className="text-2xl font-black">{value}</div>
+      <div className="text-xs text-muted-foreground mt-1">{label}</div>
     </div>
   );
 }
