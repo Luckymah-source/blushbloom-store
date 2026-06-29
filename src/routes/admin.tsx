@@ -355,13 +355,13 @@ function AdminDashboard({ email }: { email: string }) {
                 </select>
               </Field>
               <Field label="لینک تصویر" full>
-                <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} dir="ltr" placeholder="https://..." />
-              </Field>
-              {form.image && (
-                <div className="md:col-span-2">
-                  <img src={form.image} alt="پیش‌نمایش" className="w-24 h-24 rounded-xl object-cover border border-border" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
-                </div>
-              )}
+  <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} dir="ltr" placeholder="https://..." />
+</Field>
+{form.image && (
+  <div className="md:col-span-2">
+    <img src={form.image} alt="پیش‌نمایش" className="w-24 h-24 rounded-xl object-cover border border-border" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
+  </div>
+)}
               <Field label="توضیحات" full>
                 <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} placeholder="توضیح کوتاه..." />
               </Field>
