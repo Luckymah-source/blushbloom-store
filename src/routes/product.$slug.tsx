@@ -354,9 +354,4 @@ function ProductPage() {
               {complementary.map((rp) => <ProductCard key={rp.id} p={rp} />)}
             </div>
           </section>
-        )}
-      </main>
-      <Footer />
-    </div>
-  );
-}
+  ع
