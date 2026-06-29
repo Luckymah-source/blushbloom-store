@@ -320,7 +320,7 @@ function AdminDashboard({ email }: { email: string }) {
           </>
         )}
 
-        {view === "form" && (
+        {tab === "products" && view === "form" && (
           <div className="bg-card rounded-3xl border border-border p-6 max-w-3xl mx-auto">
             <h2 className="text-lg font-black text-primary mb-5">{editingId ? "ویرایش محصول" : "افزودن محصول جدید"}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -382,7 +382,7 @@ function AdminDashboard({ email }: { email: string }) {
           </div>
         )}
 
-        {view === "delete" && (
+        {tab === "products" && view === "delete" && (
           <div className="bg-card rounded-3xl border border-border p-8 max-w-md mx-auto mt-12 text-center">
             <div className="text-5xl mb-3">🗑️</div>
             <h3 className="text-lg font-black text-destructive mb-2">حذف محصول</h3>
