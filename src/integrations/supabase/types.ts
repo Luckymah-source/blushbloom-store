@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      brands: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          logo: string | null
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          logo?: string | null
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          logo?: string | null
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           badge: string | null
