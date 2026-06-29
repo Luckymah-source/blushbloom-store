@@ -12,6 +12,8 @@ import {
   type DBProduct,
   type ProductInput,
 } from "@/lib/products-api";
+import { fetchActiveBrands } from "@/lib/brands-api";
+import { AdminBrands } from "@/components/site/admin-brands";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -31,7 +33,7 @@ const CATEGORIES = [
   { value: "hair", label: "مراقبت از مو" },
   { value: "body", label: "بدن و حمام" },
 ];
-const BRANDS = ["آشنا پرفیوم", "لومیه", "پاریس بل", "اسکین لب", "رزا", "نیووآ", "بل‌فام", "اوریفلیم"];
+const FALLBACK_BRANDS = ["آشنا پرفیوم"];
 const BADGES = ["", "پرفروش", "جدید", "تخفیف", "ویژه"];
 
 function fa(n: number | null | undefined) {
@@ -122,7 +124,7 @@ function AdminPage() {
 const EMPTY_FORM = {
   slug: "",
   name: "",
-  brand: BRANDS[0],
+  brand: FALLBACK_BRANDS[0],
   category: "perfume",
   price: "",
   discount_price: "",
@@ -135,6 +137,7 @@ const EMPTY_FORM = {
 
 function AdminDashboard({ email }: { email: string }) {
   const qc = useQueryClient();
+  const [tab, setTab] = useState<"products" | "brands">("products");
   const [view, setView] = useState<"list" | "form" | "delete">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -146,6 +149,12 @@ function AdminDashboard({ email }: { email: string }) {
     queryKey: ["admin-products"],
     queryFn: fetchAllProductsAdmin,
   });
+
+  const { data: dbBrands = [] } = useQuery({
+    queryKey: ["brands"],
+    queryFn: fetchActiveBrands,
+  });
+  const brandOptions = dbBrands.length > 0 ? dbBrands.map((b) => b.name) : FALLBACK_BRANDS;
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["admin-products"] });
@@ -234,20 +243,32 @@ function AdminDashboard({ email }: { email: string }) {
             </div>
           </div>
           <div className="flex gap-2">
-            {view === "list" && (
+            {tab === "products" && view === "list" && (
               <button onClick={openAdd} className="bg-white text-primary rounded-xl px-4 py-2 text-sm font-bold hover:opacity-90">+ افزودن محصول</button>
             )}
-            {view !== "list" && (
+            {tab === "products" && view !== "list" && (
               <button onClick={() => setView("list")} className="bg-white/15 border border-white/30 rounded-xl px-4 py-2 text-sm hover:bg-white/25">← بازگشت</button>
             )}
             <Link to="/" className="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs hover:bg-white/20">سایت</Link>
             <button onClick={async () => { await supabase.auth.signOut(); }} className="bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs hover:bg-white/20">خروج</button>
           </div>
         </div>
+        <div className="max-w-6xl mx-auto px-4 pb-3 flex gap-2">
+          <button onClick={() => { setTab("products"); setView("list"); }}
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${tab === "products" ? "bg-white text-primary" : "bg-white/15 text-white hover:bg-white/25"}`}>
+            محصولات
+          </button>
+          <button onClick={() => { setTab("brands"); setView("list"); }}
+            className={`rounded-xl px-4 py-2 text-sm font-bold transition ${tab === "brands" ? "bg-white text-primary" : "bg-white/15 text-white hover:bg-white/25"}`}>
+            برندها
+          </button>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-6">
-        {view === "list" && (
+        {tab === "brands" && <AdminBrands />}
+
+        {tab === "products" && view === "list" && (
           <>
             <div className="grid grid-cols-3 gap-3 mb-6">
               <StatCard label="کل محصولات" value={products.length.toLocaleString("fa-IR")} color="bg-primary" />
@@ -311,7 +332,7 @@ function AdminDashboard({ email }: { email: string }) {
               </Field>
               <Field label="برند *">
                 <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className={inputCls}>
-                  {BRANDS.map((b) => <option key={b}>{b}</option>)}
+                  {brandOptions.map((b) => <option key={b}>{b}</option>)}
                 </select>
               </Field>
               <Field label="دسته‌بندی *">
