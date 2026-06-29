@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -117,6 +118,17 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    // Bootstrap Supabase early so detectSessionInUrl processes any auth
+    // tokens returned in the URL hash (e.g. after email verification),
+    // and clean the URL once the session is established.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session && typeof window !== "undefined" && window.location.hash.includes("access_token")) {
+        window.history.replaceState({}, "", window.location.pathname + window.location.search);
+      }
+    }).catch(() => {});
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
