@@ -55,16 +55,21 @@ function AdminPage() {
   useEffect(() => {
     let mounted = true;
     const check = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (!mounted) return;
-      if (!data.user) {
-        setAuthState("anon");
-        return;
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (!mounted) return;
+        if (error || !data.user) {
+          setAuthState("anon");
+          return;
+        }
+        setUserEmail(data.user.email || "");
+        const isAdmin = await checkIsAdmin(data.user.id).catch(() => false);
+        if (!mounted) return;
+        setAuthState(isAdmin ? "admin" : "user");
+      } catch (e) {
+        console.error("[admin] auth check failed", e);
+        if (mounted) setAuthState("anon");
       }
-      setUserEmail(data.user.email || "");
-      const isAdmin = await checkIsAdmin(data.user.id);
-      if (!mounted) return;
-      setAuthState(isAdmin ? "admin" : "user");
     };
     check();
     const { data: sub } = supabase.auth.onAuthStateChange(() => check());
