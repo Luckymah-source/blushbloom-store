@@ -144,6 +144,7 @@ function AdminDashboard({ email }: { email: string }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("all");
+  const [uploading, setUploading] = useState(false);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -176,6 +177,30 @@ function AdminDashboard({ email }: { email: string }) {
     onSuccess: () => { invalidate(); toast.success("محصول حذف شد"); setView("list"); setDeleteId(null); },
     onError: (e: Error) => toast.error("خطا در حذف: " + e.message),
   });
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file, { upsert: true });
+      if (error) {
+        toast.error("خطا در آپلود: " + error.message);
+        return;
+      }
+      const { data: urlData } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(fileName);
+      setForm((f) => ({ ...f, image: urlData.publicUrl }));
+      toast.success("تصویر آپلود شد ✓");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   function openAdd() {
     setForm({ ...EMPTY_FORM });
@@ -354,14 +379,29 @@ function AdminDashboard({ email }: { email: string }) {
                   {BADGES.map((b) => <option key={b} value={b}>{b || "بدون برچسب"}</option>)}
                 </select>
               </Field>
-              <Field label="لینک تصویر" full>
-  <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className={inputCls} dir="ltr" placeholder="https://..." />
-</Field>
-{form.image && (
-  <div className="md:col-span-2">
-    <img src={form.image} alt="پیش‌نمایش" className="w-24 h-24 rounded-xl object-cover border border-border" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
-  </div>
-)}
+              <Field label="تصویر محصول" full>
+                <div className="space-y-2">
+                  <label className={`flex items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed border-primary/40 bg-rose-soft/30 px-4 py-4 text-sm font-bold text-primary cursor-pointer hover:bg-rose-soft/50 transition ${uploading ? "opacity-60 pointer-events-none" : ""}`}>
+                    {uploading ? "در حال آپلود..." : "📷 انتخاب عکس از گالری"}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                  </label>
+                  <input
+                    value={form.image}
+                    onChange={(e) => setForm({ ...form, image: e.target.value })}
+                    className={inputCls}
+                    dir="ltr"
+                    placeholder="یا لینک تصویر را وارد کنید..."
+                  />
+                  {form.image && (
+                    <img
+                      src={form.image}
+                      alt="پیش‌نمایش"
+                      className="w-24 h-24 rounded-xl object-cover border border-border"
+                      onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+                    />
+                  )}
+                </div>
+              </Field>
               <Field label="توضیحات" full>
                 <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={inputCls} placeholder="توضیح کوتاه..." />
               </Field>
